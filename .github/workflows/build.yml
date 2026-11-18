@@ -14,14 +14,14 @@ jobs:
       - name: Repository auschecken
         uses: actions/checkout@v4
 
-      - name: Java JDK einrichten
-        uses: actions/setup-java@v4
+      - name: Java JDK einrichten (v5)
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
 
-      - name: Maven Build durchführen (mit Offline-Toleranz falls im Cache)
+      - name: Maven Build durchführen
         run: mvn clean package -B --batch-mode
 
       - name: Release-Ordner vorbereiten und Dateien packen
