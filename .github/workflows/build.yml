@@ -1,0 +1,54 @@
+name: Build and Pack PowerTools
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Java JDK einrichten (Java 21 empfohlen für moderne Paper/Spigot Plugins)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Mit Maven bauen (JAR generieren)
+        run: mvn clean package -B
+
+      - name: Release-Ordner vorbereiten und Dateien packen
+        run: |
+          mkdir -p output/PowerTools-Release
+          
+          # Kompilierte JAR-Datei kopieren (Pfad an dein Maven-Ziel anpassen, meist target/)
+          cp target/*.jar output/PowerTools-Release/
+          
+          # Resourcepack-Ordner kopieren (falls vorhanden)
+          if [ -d "resourcepack" ]; then
+            cp -r resourcepack output/PowerTools-Release/
+          fi
+          
+          # README kopieren falls gewünscht
+          if [ -f "README.md" ]; then
+            cp README.md output/PowerTools-Release/
+          fi
+          
+          # Alles als ZIP packen
+          cd output
+          zip -r ../PowerTools-Bundle.zip PowerTools-Release
+
+      - name: Artefakt hochladen (zum Herunterladen in GitHub Actions)
+        uses: actions/upload-artifact@v4
+        with:
+          name: PowerTools-Distribution
+          path: PowerTools-Bundle.zip
