@@ -5,8 +5,6 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  release:
-    types: [created]
 
 jobs:
   build:
@@ -16,38 +14,40 @@ jobs:
       - name: Repository auschecken
         uses: actions/checkout@v4
 
-      - name: Java JDK einrichten (Java 21 empfohlen für moderne Paper/Spigot Plugins)
+      - name: Java JDK einrichten
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
 
-      - name: Mit Maven bauen (JAR generieren)
-        run: mvn clean package -B
+      - name: Maven Build durchführen (mit Offline-Toleranz falls im Cache)
+        run: mvn clean package -B --batch-mode
 
       - name: Release-Ordner vorbereiten und Dateien packen
         run: |
           mkdir -p output/PowerTools-Release
           
-          # Kompilierte JAR-Datei kopieren (Pfad an dein Maven-Ziel anpassen, meist target/)
-          cp target/*.jar output/PowerTools-Release/
+          # JAR-Datei kopieren
+          if [ -d "target" ]; then
+            cp target/*.jar output/PowerTools-Release/
+          fi
           
-          # Resourcepack-Ordner kopieren (falls vorhanden)
+          # Resourcepack kopieren
           if [ -d "resourcepack" ]; then
             cp -r resourcepack output/PowerTools-Release/
           fi
           
-          # README kopieren falls gewünscht
+          # README kopieren
           if [ -f "README.md" ]; then
             cp README.md output/PowerTools-Release/
           fi
           
-          # Alles als ZIP packen
+          # Als ZIP packen
           cd output
           zip -r ../PowerTools-Bundle.zip PowerTools-Release
 
-      - name: Artefakt hochladen (zum Herunterladen in GitHub Actions)
+      - name: Artefakt hochladen
         uses: actions/upload-artifact@v4
         with:
           name: PowerTools-Distribution
