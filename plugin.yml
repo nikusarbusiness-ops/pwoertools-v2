@@ -1,0 +1,15 @@
+name: PowerTools
+version: 1.0.0
+main: de.powersmp.powertools.PowerTools
+api-version: '1.21'
+author: PowerSMP
+description: Custom yellow-accented PowerSMP tools
+commands:
+  powertools:
+    description: Give and manage PowerTools
+    usage: /powertools give <player> <drill|axe|shovel|bucket>
+    aliases: [pt]
+permissions:
+  powertools.admin:
+    description: Allows giving PowerTools and reloading the config
+    default: op
